@@ -39,18 +39,18 @@ def initialize_database():
     conn.commit()
 
 def list_bulletins():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT id, board, sender_short_name, date, subject, unique_id FROM bulletins")
-    bulletins = c.fetchall()
-    if bulletins:
-        print_bold("Bulletins:")
-        for bulletin in bulletins:
-            print_bold(f"(ID: {bulletin[0]}, Board: {bulletin[1]}, Poster: {bulletin[2]}, Subject: {bulletin[4]})")
-    else:
-        print_bold("No bulletins found.")
-    print_separator()
-    return bulletins
+    with get_db_connection() as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT id, board, sender_short_name, date, subject, unique_id FROM bulletins")
+            bulletins = c.fetchall()
+            if bulletins:
+                print_bold("Bulletins:")
+                for bulletin in bulletins:
+                    print_bold(f"(ID: {bulletin[0]}, Board: {bulletin[1]}, Poster: {bulletin[2]}, Subject: {bulletin[4]})")
+            else:
+                print_bold("No bulletins found.")
+            print_separator()
+            return bulletins
 
 def list_mail():
     conn = get_db_connection()
