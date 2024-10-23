@@ -87,6 +87,13 @@ def post_bulletin():
             break
         content_lines.append(line)
     content = '\n'.join(content_lines)
+
+    # Get your own node ID
+    sender_id = get_own_node_id()
+    if sender_id is None:
+        print("Unable to retrieve your node ID from config.")
+        return
+
     unique_id = add_bulletin(board, sender_short_name, subject, content, bbs_nodes, None)
     print(f"Bulletin posted with ID: {unique_id}")
     pause()
@@ -94,7 +101,7 @@ def post_bulletin():
 def list_users():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT DISTINCT sender FROM mail")
+    cursor.execute("SELECT DISTINCT sender_short_name FROM mail")
     users = cursor.fetchall()
     if users:
         print("Potential Recipients:")
@@ -123,10 +130,10 @@ def send_mail():
         print(f"Recipient with short name '{recipient_short_name}' not found.")
         return
 
-    # Safely get sender_id
-    sender_id = config['user'].get('node_id', None)
-    if not sender_id:
-        print("Configuration error: 'node_id' not found in [user] section.")
+    # Get your own node ID
+    sender_id = get_own_node_id()
+    if sender_id is None:
+        print("Unable to retrieve your node ID from config.")
         return
 
     unique_id = add_mail(sender_id, sender_short_name, recipient_id, subject, content, bbs_nodes, None)
@@ -134,7 +141,13 @@ def send_mail():
     pause()
 
 def view_mail():
-    mails = get_mail(None)  # Fetch all mail messages
+    # Get your own node ID
+    sender_id = get_own_node_id()
+    if sender_id is None:
+        print("Unable to retrieve your node ID from config.")
+        return
+
+    mails = get_mail(sender_id)
     if mails:
         print("Mail Messages:")
         for mail in mails:
@@ -148,11 +161,21 @@ def get_node_id_by_short_name(short_name):
     response = requests.get('http://localhost:5000/nodes')
     if response.status_code == 200:
         nodes = response.json()
-        for node_id, node_info in nodes.items():
-            if node_info['user']['shortName'].lower() == short_name.lower():
+        for node in nodes:
+            node_id = node.get('id')
+            node_info = node
+            if node_info.get('user', {}).get('shortName', '').lower() == short_name.lower():
                 return node_id  # Return the node ID
     print(f"Recipient with short name '{short_name}' not found.")
     return None
+
+def get_own_node_id():
+    node_id = config['user'].get('node_id')
+    if node_id:
+        return node_id  # Return your node ID from config
+    else:
+        print("Node ID not found in config.")
+        return None
 
 def main_menu():
     while True:
