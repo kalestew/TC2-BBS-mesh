@@ -36,8 +36,7 @@ def send_message(message, destination, interface):
             logging.info(f"REPLY SEND ERROR {e.message}")
 
         
-        time.sleep(2)
-
+        time.sleep(15) #longer sleep to allow for retransmissions 
 
 def get_node_info(interface, short_name):
     nodes = [{'num': node_id, 'shortName': node['user']['shortName'], 'longName': node['user']['longName']}

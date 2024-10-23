@@ -97,8 +97,7 @@ def list_users():
     pause()
 
 def send_mail():
-    recipient_id = input("Enter the recipient's node ID: ")
-    sender_id = input("Enter your node ID: ")
+    recipient_short_name = input("Enter the recipient's short name: ")
     sender_short_name = input("Enter your short name: ")
     subject = input("Enter the subject of the mail: ")
     print("Enter the content of the mail. Type 'END' on a new line to finish.")
@@ -109,6 +108,16 @@ def send_mail():
             break
         content_lines.append(line)
     content = '\n'.join(content_lines)
+
+    # Find the recipient's node ID using the short name
+    recipient_id = get_node_id_by_short_name(recipient_short_name)
+    if recipient_id is None:
+        print(f"Recipient with short name '{recipient_short_name}' not found.")
+        return
+
+    # Assuming sender_id is fixed or derived from config
+    sender_id = config['user'].get('node_id', 'default_sender_id')  # Replace 'default_sender_id' with actual default
+
     unique_id = add_mail(sender_id, sender_short_name, recipient_id, subject, content, bbs_nodes, None)
     print(f"Mail sent with ID: {unique_id}")
     pause()
@@ -123,6 +132,16 @@ def view_mail():
     else:
         print("No mail messages found.")
     pause()
+
+def get_node_id_by_short_name(short_name):
+    # This function should be implemented to find the node ID by short name
+    # For example, it could query the database or use an in-memory map
+    # Here is a placeholder implementation
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT num FROM nodes WHERE shortName = ?", (short_name,))
+    result = cursor.fetchone()
+    return result[0] if result else None
 
 def main_menu():
     while True:
