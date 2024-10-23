@@ -14,7 +14,8 @@ from db_operations import (
 from utils import (
     get_node_id_from_num, get_node_info,
     get_node_short_name, send_message,
-    update_user_state
+    update_user_state,
+    last_messages  # Import last_messages
 )
 
 # Read the configuration for menu options
@@ -666,3 +667,10 @@ def handle_quick_help_command(sender_id, interface):
     response = ("✈️QUICK COMMANDS✈️\nSend command below for usage info:\nSM,, - Send "
                 "Mail\nCM - Check Mail\nPB,, - Post Bulletin\nCB,, - Check Bulletins\n")
     send_message(response, sender_id, interface)
+
+def handle_resend_last_message(sender_id, interface):
+    last_message = last_messages.get(sender_id)
+    if last_message:
+        send_message(last_message, sender_id, interface)
+    else:
+        send_message("No previous message to resend.", sender_id, interface)

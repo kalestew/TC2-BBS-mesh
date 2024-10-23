@@ -8,7 +8,8 @@ from command_handlers import (
     handle_channel_directory_command, handle_channel_directory_steps, handle_send_mail_command,
     handle_read_mail_command, handle_check_mail_command, handle_delete_mail_confirmation, handle_post_bulletin_command,
     handle_check_bulletin_command, handle_read_bulletin_command, handle_read_channel_command,
-    handle_post_channel_command, handle_list_channels_command, handle_quick_help_command
+    handle_post_channel_command, handle_list_channels_command, handle_quick_help_command,
+    handle_resend_last_message  # Import the handler
 )
 from db_operations import add_bulletin, add_mail, delete_bulletin, delete_mail, get_db_connection, add_channel
 from js8call_integration import handle_js8call_command, handle_js8call_steps, handle_group_message_selection
@@ -102,6 +103,8 @@ def process_message(sender_id, message, interface, is_sync_message=False):
             handle_post_channel_command(sender_id, message_strip, interface)
         elif message_lower.startswith("chl"):
             handle_list_channels_command(sender_id, interface)
+        elif message_lower == 'r,,':  # Handle the 'r,,' command
+            handle_resend_last_message(sender_id, interface)
         else:
             if state and state['command'] == 'MENU':
                 menu_name = state['menu']
@@ -215,3 +218,4 @@ def get_recipient_id_by_mail(unique_id):
     if result:
         return result[0]
     return None
+
