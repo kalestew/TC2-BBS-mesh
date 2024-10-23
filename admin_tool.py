@@ -26,6 +26,13 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+# Verify required sections
+required_sections = ['sync', 'user']
+for section in required_sections:
+    if not config.has_section(section):
+        print(f"Configuration error: Missing [{section}] section in config.ini.")
+        sys.exit(1)
+
 bbs_nodes = config['sync'].get('bbs_nodes', '').split(',')
 
 # Ensure bbs_nodes is a list of node IDs
@@ -116,8 +123,11 @@ def send_mail():
         print(f"Recipient with short name '{recipient_short_name}' not found.")
         return
 
-    # Assuming sender_id is fixed or derived from config
-    sender_id = config['user'].get('node_id', 'default_sender_id')  # Replace 'default_sender_id' with actual default
+    # Safely get sender_id
+    sender_id = config['user'].get('node_id', None)
+    if not sender_id:
+        print("Configuration error: 'node_id' not found in [user] section.")
+        return
 
     unique_id = add_mail(sender_id, sender_short_name, recipient_id, subject, content, bbs_nodes, None)
     print(f"Mail sent with ID: {unique_id}")
