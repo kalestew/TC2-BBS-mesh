@@ -14,6 +14,8 @@ other BBS servers listed in the config.ini file.
 
 import logging
 import time
+from flask import Flask, jsonify
+import threading
 
 from config_init import initialize_config, get_interface, init_cli_parser, merge_config
 from db_operations import initialize_database
@@ -49,12 +51,29 @@ Meshtastic Version
 """
     print(banner)
 
+app = Flask(__name__)
+
+@app.route('/nodes')
+def get_nodes():
+    nodes = [
+        {
+            'num': node_info['num'],
+            'node_id': node_id,
+            'long_name': node_info['user'].get('longName', ''),
+            'short_name': node_info['user'].get('shortName', '')
+        }
+        for node_id, node_info in interface.nodes.items()
+    ]
+    return jsonify(nodes)
+
+def run_api_server():
+    app.run(port=5000)  # Choose an appropriate port
+
 def main():
+    global interface
     display_banner()
     args = init_cli_parser()
-    config_file = None
-    if args.config is not None:
-        config_file = args.config
+    config_file = args.config if args.config else None
     system_config = initialize_config(config_file)
 
     merge_config(system_config, args)
@@ -78,6 +97,11 @@ def main():
 
     if js8call_client.db_conn:
         js8call_client.connect()
+
+    # Start the API server in a separate thread
+    api_thread = threading.Thread(target=run_api_server)
+    api_thread.daemon = True
+    api_thread.start()
 
     try:
         while True:
