@@ -33,7 +33,7 @@ def send_message(message, destination, interface):
             chunk = chunk.replace('\n', '\\n')
             logging.info(f"Sending message to user '{get_node_short_name(destid, interface)}' ({destid}) with sendID {d.id}: \"{chunk}\"")
         except Exception as e:
-            logging.info(f"REPLY SEND ERROR {e.message}")
+            logging.info(f"REPLY SEND ERROR {str(e)}")
 
         
         time.sleep(15) #longer sleep to allow for retransmissions 

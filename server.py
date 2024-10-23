@@ -23,6 +23,9 @@ from js8call_integration import JS8CallClient
 from message_processing import on_receive
 from pubsub import pub
 
+# Initialize interface at module level
+interface = None
+
 # General logging
 logging.basicConfig(
     level=logging.INFO,
@@ -55,6 +58,10 @@ app = Flask(__name__)
 
 @app.route('/nodes')
 def get_nodes():
+    global interface
+    if interface is None or not hasattr(interface, 'nodes'):
+        logging.error("Interface not initialized or lacks 'nodes' attribute.")
+        return jsonify({'error': 'Interface not initialized'}), 500
     nodes = [
         {
             'num': node_info['num'],
@@ -67,7 +74,9 @@ def get_nodes():
     return jsonify(nodes)
 
 def run_api_server():
-    app.run(port=5000)  # Choose an appropriate port
+    logging.info("Starting Flask API server on port 5000...")
+    app.run(port=5000, use_reloader=False)
+    logging.info("Flask API server started.")
 
 def main():
     global interface
@@ -98,7 +107,7 @@ def main():
     if js8call_client.db_conn:
         js8call_client.connect()
 
-    # Start the API server in a separate thread
+    # Start the API server in a separate thread after interface is initialized
     api_thread = threading.Thread(target=run_api_server)
     api_thread.daemon = True
     api_thread.start()
