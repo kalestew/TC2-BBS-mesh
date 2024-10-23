@@ -664,8 +664,15 @@ def handle_list_channels_command(sender_id, interface):
 
 
 def handle_quick_help_command(sender_id, interface):
-    response = ("✈️QUICK COMMANDS✈️\nSend command below for usage info:\nSM,, - Send "
-                "Mail\nCM - Check Mail\nPB,, - Post Bulletin\nCB,, - Check Bulletins\n")
+    response = (
+        "✈️QUICK COMMANDS✈️\n"
+        "Send command below for usage info:\n"
+        "SM,, - Send Mail\n"
+        "CM - Check Mail\n"
+        "PB,, - Post Bulletin\n"
+        "CB,, - Check Bulletins\n"
+        "R,, - Resend Last Message\n"
+    )
     send_message(response, sender_id, interface)
 
 def handle_resend_last_message(sender_id, interface):
