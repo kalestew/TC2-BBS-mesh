@@ -12,10 +12,10 @@ from db_operations import (
     add_mail,
     get_mail,
     get_mail_content,
+    get_db_connection  # Correctly import from db_operations
 )
 
 from utils import (
-    get_db_connection,
     send_message,
 )
 
