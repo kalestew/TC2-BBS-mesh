@@ -674,3 +674,4 @@ def handle_resend_last_message(sender_id, interface):
         send_message(last_message, sender_id, interface)
     else:
         send_message("No previous message to resend.", sender_id, interface)
+

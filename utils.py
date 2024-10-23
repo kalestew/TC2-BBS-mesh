@@ -3,6 +3,9 @@ import time
 
 user_states = {}
 
+# Add this global dictionary to store last messages
+last_messages = {}
+
 
 def update_user_state(user_id, state):
     user_states[user_id] = state
@@ -13,6 +16,9 @@ def get_user_state(user_id):
 
 
 def send_message(message, destination, interface):
+    # Store the message as the last message for this destination
+    last_messages[destination] = message
+
     max_payload_size = 200
     for i in range(0, len(message), max_payload_size):
         chunk = message[i:i + max_payload_size]
@@ -85,4 +91,3 @@ def send_channel_to_bbs_nodes(name, url, bbs_nodes, interface):
     message = f"CHANNEL|{name}|{url}"
     for node_id in bbs_nodes:
         send_message(message, node_id, interface)
-
