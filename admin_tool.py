@@ -148,9 +148,9 @@ def get_node_id_by_short_name(short_name):
     response = requests.get('http://localhost:5000/nodes')
     if response.status_code == 200:
         nodes = response.json()
-        for node in nodes:
-            if node['short_name'].lower() == short_name.lower():
-                return node['num']
+        for node_id, node_info in nodes.items():
+            if node_info['user']['shortName'].lower() == short_name.lower():
+                return node_id  # Return the node ID
     print(f"Recipient with short name '{short_name}' not found.")
     return None
 
